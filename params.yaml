@@ -1,0 +1,23 @@
+random_seed: 42
+device: "cuda"  # "cuda" or "cpu"
+
+model:
+  n_classes: 10  # number of classes
+  img_dim: 28  # image dimension
+  z_dim: 100  # noise vector dimension
+  dropout: 0.0  # dropout rate
+
+training:
+  batch_size: 64  # batch size for training
+  num_epochs: 100  # number of epochs
+  learning_rate: 0.0002  # learning rate for the optimizer
+  momentum: 0.5  # momentum factor for SGD
+  decay_factor: 1.00004  # gamma for ExponentialLR
+
+output:
+  checkpoint:
+    save_frequency: 10  # interval (in epochs)
+    output_dir: "checkpoints/"  # directory to save checkpoint
+  generated_images:
+    save_frequency: 10  # interval (in epochs)
+    output_dir: "generated_samples/"  # directory to save images
