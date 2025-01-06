@@ -1,6 +1,5 @@
 import os
 from tqdm import tqdm
-from matplotlib import pyplot as plt
 import torch
 import torch.nn as nn
 from torch.optim import SGD
@@ -49,16 +48,12 @@ def save_generated_samples(epoch, generator, z_dim, n_classes, device):
 
         # save images
         grid = torchvision.utils.make_grid(fake_images, nrow=4, normalize=True)
-        plt.imshow(grid.permute(1, 2, 0))
-        plt.title(f"Generated samples at epoch {epoch+1}")
-        plt.axis("off")
 
         # log to w&b
         wandb.log({
             "generated_samples": wandb.Image(grid, caption=f"Epoch {epoch+1}"),
             "epoch": epoch + 1,
         })
-        plt.close()
     generator.train()
 
 

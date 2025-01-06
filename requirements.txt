@@ -1,5 +1,5 @@
-pytorch
-yaml
+torch
+torchvision
+pyyaml
 tqdm
-matplotlib
 wandb
