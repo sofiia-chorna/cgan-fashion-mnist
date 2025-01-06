@@ -1,2 +1,4 @@
 pytorch
 yaml
+tqdm
+matplotlib

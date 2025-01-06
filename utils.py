@@ -1,3 +1,4 @@
+import torch
 import yaml
 
 
@@ -8,3 +9,8 @@ def read_yaml(file_path):
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
     return data
+
+
+def get_device():
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    return device
