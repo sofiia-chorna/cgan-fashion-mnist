@@ -1,11 +1,11 @@
-from utils import read_yaml
+from utils import get_params_path, read_yaml
 from cgan.generator import Generator
 from cgan.discriminator import Discriminator
 from dataset import get_fashion_mnist_dataloader
 from train import train_cgan
 
 
-yaml_file = "params.yaml"
+yaml_file = get_params_path()
 params = read_yaml(yaml_file)
 
 generator = Generator(params["model"])
