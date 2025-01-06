@@ -1,6 +1,6 @@
 from utils import read_yaml
-from nn.generator import Generator
-from nn.discriminator import Discriminator
+from cgan.generator import Generator
+from cgan.discriminator import Discriminator
 from dataset import get_fashion_mnist_dataloader
 from train import train_cgan
 

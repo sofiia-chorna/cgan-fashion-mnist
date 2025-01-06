@@ -35,14 +35,11 @@ def save_checkpoint(epoch, generator, discriminator, generator_optimizer, discri
         "gen_loss": g_loss_epoch,
         "disc_loss": d_loss_epoch,
     }
-    artifact = wandb.Artifact(f"cgan_checkpoint_epoch_{epoch+1}", type="model")
-    with artifact.new_file(f"checkpoint_epoch_{epoch+1}.pth", mode="wb") as f:
-        torch.save(checkpoint, f)
-    wandb.log_artifact(artifact)
-    print(f"Checkpoint saved for epoch {epoch+1}")
+    torch.save(checkpoint, os.path.join(checkpoint_dir, f"cgan_checkpoint_epoch_{epoch+1}.pth"))
+    print("Checkpoint saved for epoch", epoch+1)
 
 
-def save_generated_samples(epoch, generator, z_dim, n_classes, samples_dir, device):
+def save_generated_samples(epoch, generator, z_dim, n_classes, device):
     """Generate and save samples from the generator with labels"""
     generator.eval()
     with torch.no_grad():
@@ -69,7 +66,7 @@ def train_cgan(generator, discriminator, dataloader, params):
     g_losses, d_losses = [], []
 
     # init w&b
-    wandb.init(project="cgan_training", config=params)
+    wandb.init(project="cgan-fashion-mnist", config=params)
     config = wandb.config
 
     # params
@@ -83,13 +80,11 @@ def train_cgan(generator, discriminator, dataloader, params):
     checkpoint_dir = checkpoint_params.get("output_dir", "checkpoints/")
     checkpoint_save_frequency = checkpoint_params.get("save_frequency", 100)
     samples_params = config.get("generated_samples", {})
-    samples_dir = samples_params.get("output_dir", "generated_samples/")
     samples_save_frequency = samples_params.get("save_frequency", 100)
     checkpoint_path = config.get("checkpoint_path")
 
-    # ensure directories exist
+    # ensure directory exist
     os.makedirs(checkpoint_dir, exist_ok=True)
-    os.makedirs(samples_dir, exist_ok=True)
 
     # setup training
     device = get_device()
@@ -177,11 +172,11 @@ def train_cgan(generator, discriminator, dataloader, params):
             save_checkpoint(epoch, generator, discriminator, generator_optimizer, discriminator_optimizer, g_loss_epoch, d_loss_epoch, checkpoint_dir)
 
         if (epoch + 1) % samples_save_frequency == 0:
-            save_generated_samples(epoch, generator, z_dim, n_classes, samples_dir, device)
+            save_generated_samples(epoch, generator, z_dim, n_classes, device)
 
     # final checkpoint save
     save_checkpoint(epoch, generator, discriminator, generator_optimizer, discriminator_optimizer, g_loss_epoch, d_loss_epoch, checkpoint_dir)
-    save_generated_samples(epoch, generator, z_dim, n_classes, samples_dir, device)
+    save_generated_samples(epoch, generator, z_dim, n_classes, device)
 
     # finish logging
     wandb.finish()
