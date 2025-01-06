@@ -2,3 +2,4 @@ pytorch
 yaml
 tqdm
 matplotlib
+wandb

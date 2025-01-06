@@ -174,3 +174,4 @@ cython_debug/
 data/
 checkpoints/
 generated_samples/
+wandb/

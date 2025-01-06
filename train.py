@@ -4,7 +4,9 @@ from matplotlib import pyplot as plt
 import torch
 import torch.nn as nn
 from torch.optim import SGD
+import torchvision
 from torch.optim.lr_scheduler import ExponentialLR
+import wandb
 from utils import get_device
 
 
@@ -33,8 +35,11 @@ def save_checkpoint(epoch, generator, discriminator, generator_optimizer, discri
         "gen_loss": g_loss_epoch,
         "disc_loss": d_loss_epoch,
     }
-    torch.save(checkpoint, os.path.join(checkpoint_dir, f"cgan_checkpoint_epoch_{epoch+1}.pth"))
-    print("Checkpoint saved for epoch", epoch+1)
+    artifact = wandb.Artifact(f"cgan_checkpoint_epoch_{epoch+1}", type="model")
+    with artifact.new_file(f"checkpoint_epoch_{epoch+1}.pth", mode="wb") as f:
+        torch.save(checkpoint, f)
+    wandb.log_artifact(artifact)
+    print(f"Checkpoint saved for epoch {epoch+1}")
 
 
 def save_generated_samples(epoch, generator, z_dim, n_classes, samples_dir, device):
@@ -45,18 +50,17 @@ def save_generated_samples(epoch, generator, z_dim, n_classes, samples_dir, devi
         labels = torch.randint(0, n_classes, (16,)).to(device)
         fake_images = generator(noise, labels).view(-1, 1, 28, 28).cpu()
 
-        # save labels
-        labels_filename = os.path.join(samples_dir, f"labels_epoch_{epoch+1}.txt")
-        with open(labels_filename, 'w') as f:
-            f.write("Labels for generated samples:\n")
-            f.write(str(labels.tolist()))
-
         # save images
-        grid = torch.cat([fake_images[i] for i in range(16)], dim=2)
-        plt.imshow(grid.squeeze(), cmap="gray")
+        grid = torchvision.utils.make_grid(fake_images, nrow=4, normalize=True)
+        plt.imshow(grid.permute(1, 2, 0))
         plt.title(f"Generated samples at epoch {epoch+1}")
         plt.axis("off")
-        plt.savefig(os.path.join(samples_dir, f"generated_samples_epoch_{epoch+1}.png"))
+
+        # log to w&b
+        wandb.log({
+            "generated_samples": wandb.Image(grid, caption=f"Epoch {epoch+1}"),
+            "epoch": epoch + 1,
+        })
         plt.close()
     generator.train()
 
@@ -64,27 +68,31 @@ def save_generated_samples(epoch, generator, z_dim, n_classes, samples_dir, devi
 def train_cgan(generator, discriminator, dataloader, params):
     g_losses, d_losses = [], []
 
+    # init w&b
+    wandb.init(project="cgan_training", config=params)
+    config = wandb.config
+
     # params
-    lr = params.get("learning_rate", 0.1)
-    momentum = params.get("momentum", 0.5)
-    decay_factor = params.get("decay_factor", 1.00004)
-    num_epochs = params.get("num_epochs", 10)
-    z_dim = params.get("z_dim", 100)
-    n_classes = params.get("n_classes", 10)
-    checkpoint_params = params.get("checkpoint", {})
+    lr = config.get("learning_rate", 0.1)
+    momentum = config.get("momentum", 0.5)
+    decay_factor = config.get("decay_factor", 1.00004)
+    num_epochs = config.get("num_epochs", 10)
+    z_dim = config.get("z_dim", 100)
+    n_classes = config.get("n_classes", 10)
+    checkpoint_params = config.get("checkpoint", {})
     checkpoint_dir = checkpoint_params.get("output_dir", "checkpoints/")
     checkpoint_save_frequency = checkpoint_params.get("save_frequency", 100)
-    samples_params = params.get("generated_samples", {})
+    samples_params = config.get("generated_samples", {})
     samples_dir = samples_params.get("output_dir", "generated_samples/")
     samples_save_frequency = samples_params.get("save_frequency", 100)
-    checkpoint_path = params.get("checkpoint_path")
+    checkpoint_path = config.get("checkpoint_path")
 
     # ensure directories exist
     os.makedirs(checkpoint_dir, exist_ok=True)
     os.makedirs(samples_dir, exist_ok=True)
 
+    # setup training
     device = get_device()
-
     bce = nn.BCELoss().to(device)
     generator = generator.to(device)
     discriminator = discriminator.to(device)
@@ -153,6 +161,15 @@ def train_cgan(generator, discriminator, dataloader, params):
         g_losses.append(g_loss_epoch / len(dataloader))
         d_losses.append(d_loss_epoch / len(dataloader))
 
+        # log to w&b
+        wandb.log({
+            "epoch": epoch + 1,
+            "gen_loss": g_losses[-1],
+            "disc_loss": d_losses[-1],
+            "lr_generator": generator_scheduler.get_last_lr()[0],
+            "lr_discriminator": discriminator_scheduler.get_last_lr()[0],
+        })
+
         print("Gen loss:", g_losses[-1], "Disc loss:", d_losses[-1])
 
         # save checkpoints and samples periodically
@@ -165,3 +182,6 @@ def train_cgan(generator, discriminator, dataloader, params):
     # final checkpoint save
     save_checkpoint(epoch, generator, discriminator, generator_optimizer, discriminator_optimizer, g_loss_epoch, d_loss_epoch, checkpoint_dir)
     save_generated_samples(epoch, generator, z_dim, n_classes, samples_dir, device)
+
+    # finish logging
+    wandb.finish()

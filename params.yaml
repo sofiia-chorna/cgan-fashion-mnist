@@ -9,7 +9,7 @@ model:
 training:
   batch_size: 64  # batch size for training
   num_epochs: 1  # number of epochs
-  learning_rate: 0.0002  # learning rate for the optimizer
+  learning_rate: 0.1  # learning rate for the optimizer
   momentum: 0.5  # momentum factor for SGD
   decay_factor: 1.00004  # gamma for ExponentialLR
   z_dim: 100  # noise vector dimension
