@@ -35,7 +35,7 @@ def get_params_path():
 
 
 def plot_losses(gen_losses, disc_losses, epoch, save_dir):
-    epochs = list(range(epoch + 1))
+    epochs = list(range(epoch + 1, epoch + 1 + len(gen_losses)))
 
     # plot
     plt.figure(figsize=(10, 5))
@@ -52,3 +52,4 @@ def plot_losses(gen_losses, disc_losses, epoch, save_dir):
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     plt.savefig(os.path.join(save_dir, f"loss_plot_{timestamp}.png"))
     plt.close()
+
