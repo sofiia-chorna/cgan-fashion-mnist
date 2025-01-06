@@ -1,7 +1,10 @@
 from utils import read_yaml
+from nn.generator import Generator
+from nn.discriminator import Discriminator
 
 
 yaml_file = "params.yaml"
-config = read_yaml(yaml_file)
+params = read_yaml(yaml_file)
 
-print(config)
+generator = Generator(params["model"])
+discriminator = Discriminator(params["model"])

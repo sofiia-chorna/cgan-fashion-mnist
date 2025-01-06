@@ -4,36 +4,37 @@ import torch.nn.functional as F
 
 
 class Generator(nn.Module):
-    def __init__(self, z_dim=100, n_classes=10, img_dim=28):
+    def __init__(self, params):
         super().__init__()
 
         # params
-        self.z_dim = z_dim  # noise vector size
-        self.n_classes = n_classes
-        self.img_dim = img_dim  # output image size
+        self.z_dim = params.get('z_dim', 100)
+        self.n_classes = params.get('n_classes', 10)
+        self.img_dim = params.get('img_dim', 28)
+        self.droupout = params.get('droupout', 0)
 
         # fully connected layers for noise and labels
         self.fc_noise = nn.Sequential(
-            nn.Linear(z_dim, 200),
+            nn.Linear(self.z_dim, 200),
             nn.ReLU(),
-            nn.Dropout(0)
+            nn.Dropout(self.droupout)
         )
         self.fc_label = nn.Sequential(
-            nn.Linear(n_classes, 1000),
+            nn.Linear(self.n_classes, 1000),
             nn.ReLU(),
-            nn.Dropout(0)
+            nn.Dropout(self.droupout)
         )
 
         # combined layers
         self.fc_combined = nn.Sequential(
             nn.Linear(200 + 1000, 1200),
             nn.ReLU(),
-            nn.Dropout(0)
+            nn.Dropout(self.droupout)
         )
 
         # output layer to map to image dims
         self.fc_output = nn.Sequential(
-            nn.Linear(1200, img_dim * img_dim),
+            nn.Linear(1200, self.img_dim * self.img_dim),
             nn.Sigmoid()  # output in [0, 1]
         )
 
