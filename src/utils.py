@@ -1,4 +1,7 @@
+import os
+import time
 import argparse
+import matplotlib.pyplot as plt
 import torch
 import yaml
 
@@ -29,3 +32,23 @@ def get_params_path():
     )
     args = parser.parse_args()
     return args.params
+
+
+def plot_losses(gen_losses, disc_losses, epoch, save_dir):
+    epochs = list(range(epoch + 1))
+
+    # plot
+    plt.figure(figsize=(10, 5))
+    plt.plot(epochs, gen_losses, label="Generator Loss", color="blue", marker="o")
+    plt.plot(epochs, disc_losses, label="Discriminator Loss", color="red", marker="x")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.title("Generator and Discriminator Loss Over Epochs")
+
+    # save fig
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    plt.savefig(os.path.join(save_dir, f"loss_plot_{timestamp}.png"))
+    plt.close()

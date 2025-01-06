@@ -6,7 +6,7 @@ from torch.optim import SGD
 import torchvision
 from torch.optim.lr_scheduler import ExponentialLR
 import wandb
-from utils import get_device
+from utils import get_device, plot_losses
 
 
 def load_checkpoint(checkpoint_path, generator, discriminator, generator_optimizer, discriminator_optimizer):
@@ -77,9 +77,11 @@ def train_cgan(generator, discriminator, dataloader, params):
     samples_params = config.get("generated_samples", {})
     samples_save_frequency = samples_params.get("save_frequency", 100)
     checkpoint_path = config.get("checkpoint_path")
+    loss_plots_dir = os.path.join(checkpoint_dir, "loss_plots/")
 
     # ensure directory exist
     os.makedirs(checkpoint_dir, exist_ok=True)
+    os.makedirs(loss_plots_dir, exist_ok=True)
 
     # setup training
     device = get_device()
@@ -175,3 +177,5 @@ def train_cgan(generator, discriminator, dataloader, params):
 
     # finish logging
     wandb.finish()
+
+    plot_losses(g_losses, d_losses, epoch, loss_plots_dir)
