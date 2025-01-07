@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import torch
 import yaml
 
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 def read_yaml(file_path):
     """
@@ -13,12 +15,6 @@ def read_yaml(file_path):
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
     return data
-
-
-def get_device():
-    """Takes the device for the computation"""
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    return device
 
 
 def get_input_params():
@@ -56,8 +52,7 @@ def get_input_params():
 def load_checkpoint(checkpoint_path, generator, discriminator, generator_optimizer=None, discriminator_optimizer=None, load_optimizers=True):
     """Load model and optimizer states from a checkpoint file."""
     if checkpoint_path and os.path.exists(checkpoint_path):
-        device = get_device()
-        checkpoint = torch.load(checkpoint_path, map_location=device)
+        checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
         generator.load_state_dict(checkpoint['generator_state_dict'])
         discriminator.load_state_dict(checkpoint['discriminator_state_dict'])
 

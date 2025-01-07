@@ -8,6 +8,7 @@ from eval import eval_cgan
 
 yaml_file, mode = get_input_params()
 params = read_yaml(yaml_file)
+batch_size = params.get("batch_size", 64)
 
 generator = Generator(params["model"])
 discriminator = Discriminator(params["model"])
@@ -16,5 +17,5 @@ if mode == "train":
     train_dl = get_fashion_mnist_dataloader(train=True)
     train_cgan(generator, discriminator, train_dl, params["training"])
 else:
-    test_dl = get_fashion_mnist_dataloader(train=False)
+    test_dl = get_fashion_mnist_dataloader(train=False, batch_size=batch_size)
     eval_cgan(generator, discriminator, test_dl, params["evaluation"])

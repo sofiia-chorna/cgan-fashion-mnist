@@ -1,4 +1,5 @@
 random_seed: 42
+batch_size: 100
 
 model:
   n_classes: 10  # number of classes
@@ -23,5 +24,5 @@ training:
 evaluation:
   checkpoint_path: "cgan_checkpoint_epoch_100.pth"  # path to saved checkpoint file
   output_dir: "../eval/"  # directory to save evaluations
-  num_samples: 64   # number of images to generate
+  num_samples: 100  # number of images to generate
 
