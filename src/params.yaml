@@ -8,14 +8,20 @@ model:
 
 training:
   batch_size: 64  # batch size for training
-  num_epochs: 1  # number of epochs
+  num_epochs: 2 # number of epochs
   learning_rate: 0.1  # learning rate for the optimizer
   momentum: 0.5  # momentum factor for SGD
   decay_factor: 1.00004  # gamma for ExponentialLR
   z_dim: 100  # noise vector dimension
   checkpoint:
     save_frequency: 10  # interval (in epochs)
-    output_dir: "checkpoints/"  # directory to save checkpoint
+    output_dir: "../checkpoints/"  # directory to save checkpoint
   generated_samples:
     save_frequency: 10  # interval (in epochs)
-    output_dir: "generated_samples/"  # directory to save images
+    output_dir: "../generated_samples_train/"  # directory to save images
+
+evaluation:
+  checkpoint_path: "cgan_checkpoint_epoch_100.pth"  # path to saved checkpoint file
+  output_dir: "../eval/"  # directory to save evaluations
+  num_samples: 64   # number of images to generate
+

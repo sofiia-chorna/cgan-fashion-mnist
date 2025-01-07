@@ -6,21 +6,7 @@ from torch.optim import SGD
 import torchvision
 from torch.optim.lr_scheduler import ExponentialLR
 import wandb
-from utils import get_device, plot_losses
-
-
-def load_checkpoint(checkpoint_path, generator, discriminator, generator_optimizer, discriminator_optimizer):
-    """Load model and optimizer states from a checkpoint file"""
-    if checkpoint_path and os.path.exists(checkpoint_path):
-        checkpoint = torch.load(checkpoint_path)
-        generator.load_state_dict(checkpoint['generator_state_dict'])
-        discriminator.load_state_dict(checkpoint['discriminator_state_dict'])
-        generator_optimizer.load_state_dict(checkpoint['generator_optimizer_state_dict'])
-        discriminator_optimizer.load_state_dict(checkpoint['discriminator_optimizer_state_dict'])
-        start_epoch = checkpoint['epoch']
-        print(f"Resuming from epoch {start_epoch}...")
-        return start_epoch
-    return 0
+from utils import get_device, plot_losses, load_checkpoint
 
 
 def save_checkpoint(epoch, generator, discriminator, generator_optimizer, discriminator_optimizer, g_loss_epoch, d_loss_epoch, checkpoint_dir):
@@ -61,7 +47,7 @@ def train_cgan(generator, discriminator, dataloader, params):
     g_losses, d_losses = [], []
 
     # init w&b
-    wandb.init(project="cgan-fashion-mnist", config=params)
+    wandb.init(project="cgan-fashion-mnist", config=params, job_type="train")
     config = wandb.config
 
     # params
