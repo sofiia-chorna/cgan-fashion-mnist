@@ -14,15 +14,11 @@ training:
   momentum: 0.5  # momentum factor for SGD
   decay_factor: 1.00004  # gamma for ExponentialLR
   z_dim: 100  # noise vector dimension
-  checkpoint:
-    save_frequency: 10  # interval (in epochs)
-    output_dir: "../checkpoints/"  # directory to save checkpoint
-  generated_samples:
-    save_frequency: 10  # interval (in epochs)
-    output_dir: "../generated_samples_train/"  # directory to save images
+  samples_save_frequency: 10  # interval (in epochs) to save resultat of generation
 
 evaluation:
-  checkpoint_path: "cgan_checkpoint_epoch_100.pth"  # path to saved checkpoint file
+  checkpoints:  # path to saved checkpoint file  (relative to the params.yaml)
+    discriminator_path: "../runs/2025-01-08_00-15-35/best_discriminator.pth"
+    generator_path: "../runs/2025-01-08_00-15-35/best_generator.pth"
   output_dir: "../eval/"  # directory to save evaluations
   num_samples: 100  # number of images to generate
-

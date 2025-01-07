@@ -3,7 +3,7 @@ from datetime import datetime
 import torch
 import torchvision
 import wandb
-from utils import DEVICE, load_checkpoint
+from utils import DEVICE
 from dim_red import run_dim_reduction, get_feature_extractor
 
 
@@ -29,6 +29,13 @@ def save_images(images, labels, output_dir, prefix, nrow=10):
     return image_save_path, labels_save_path
 
 
+def load_checkpoint(path, model):
+    if path and os.path.exists(path):
+        print(f"Loading a checkpoint from {path}...")
+        model_state = torch.load(path, map_location=DEVICE)
+        model.load_state_dict(model_state)
+
+
 def generate_samples(generator, output_dir, num_samples, save=False):
     # generate random noise
     noise = torch.randn(num_samples, generator.z_dim).to(DEVICE)
@@ -52,12 +59,18 @@ def eval_cgan(generator, discriminator, dataloader, params):
     config = wandb.config
 
     # params
-    checkpoint_path = config.get("checkpoint_path")
+    checkpoint_config = config.get("checkpoints", {})
+    generator_path = checkpoint_config.get("generator_path")
+    discriminator_path = checkpoint_config.get("discriminator_path")
     output_dir = config.get("output_dir")
     num_samples = config.get("num_samples", 64)
 
     # load checkpoint if provided
-    _ = load_checkpoint(checkpoint_path, generator, discriminator)
+    _ = load_checkpoint(generator_path, generator)
+    _ = load_checkpoint(discriminator_path, discriminator)
+
+    generator.eval()
+    discriminator.eval()
 
     # generate run id
     id = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')

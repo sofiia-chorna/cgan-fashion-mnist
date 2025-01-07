@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from tqdm import tqdm
 import torch
 import torch.nn as nn
@@ -6,34 +7,50 @@ from torch.optim import SGD
 import torchvision
 from torch.optim.lr_scheduler import ExponentialLR
 import wandb
-from utils import DEVICE, plot_losses, load_checkpoint
+from utils import DEVICE, plot_losses
 
 
-def save_checkpoint(epoch, generator, discriminator, generator_optimizer, discriminator_optimizer, g_loss_epoch, d_loss_epoch, checkpoint_dir):
-    """Save model and optimizer states along with epoch and loss"""
+def save_checkpoint(epoch, g, d, g_optimizer, d_optimizer, g_loss_epoch, d_loss_epoch, run_dir):
+    """Save model, optimizer states, epoch and loss"""
     checkpoint = {
         "epoch": epoch,
-        "generator_state_dict": generator.state_dict(),
-        "discriminator_state_dict": discriminator.state_dict(),
-        "generator_optimizer_state_dict": generator_optimizer.state_dict(),
-        "discriminator_optimizer_state_dict": discriminator_optimizer.state_dict(),
+        "generator_state_dict": g.state_dict(),
+        "discriminator_state_dict": d.state_dict(),
+        "generator_optimizer_state_dict": g_optimizer.state_dict(),
+        "discriminator_optimizer_state_dict": d_optimizer.state_dict(),
         "gen_loss": g_loss_epoch,
         "disc_loss": d_loss_epoch,
     }
-    torch.save(checkpoint, os.path.join(checkpoint_dir, f"cgan_checkpoint_epoch_{epoch+1}.pth"))
+    torch.save(checkpoint, os.path.join(run_dir, f"cgan_checkpoint_epoch_{epoch+1}.pth"))
     print("Checkpoint saved for epoch", epoch+1)
 
 
-def save_generated_samples(epoch, generator, z_dim, n_classes, device):
+def load_checkpoint(checkpoint_path, generator, discriminator, generator_optimizer, discriminator_optimizer):
+    """Load model and optimizer states from a checkpoint file."""
+    if checkpoint_path and os.path.exists(checkpoint_path):
+        checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
+        generator.load_state_dict(checkpoint['generator_state_dict'])
+        discriminator.load_state_dict(checkpoint['discriminator_state_dict'])
+        generator_optimizer.load_state_dict(checkpoint['generator_optimizer_state_dict'])
+        discriminator_optimizer.load_state_dict(checkpoint['discriminator_optimizer_state_dict'])
+        start_epoch = checkpoint['epoch']
+        print(f"Loading a checkpoint from epoch {start_epoch}...")
+        return start_epoch
+    return 0
+
+
+def save_generated_samples(epoch, generator, samples_dir, num_samples=16):
     """Generate and save samples from the generator with labels"""
     generator.eval()
     with torch.no_grad():
-        noise = torch.randn(16, z_dim).to(device)
-        labels = torch.randint(0, n_classes, (16,)).to(device)
+        noise = torch.randn(num_samples, generator.z_dim).to(DEVICE)
+        labels = torch.randint(0, generator.n_classes, (num_samples,)).to(DEVICE)
         fake_images = generator(noise, labels).view(-1, 1, 28, 28).cpu()
 
         # save images
         grid = torchvision.utils.make_grid(fake_images, nrow=4, normalize=True)
+        image_save_path = os.path.join(samples_dir, f"epoch_{epoch+1}.png")
+        torchvision.utils.save_image(grid, image_save_path)
 
         # log to w&b
         wandb.log({
@@ -45,6 +62,7 @@ def save_generated_samples(epoch, generator, z_dim, n_classes, device):
 
 def train_cgan(generator, discriminator, dataloader, params):
     g_losses, d_losses = [], []
+    best_g_loss, best_d_loss = float('inf'), float('inf')
 
     # init w&b
     wandb.init(project="cgan-fashion-mnist", config=params, job_type="train")
@@ -56,18 +74,19 @@ def train_cgan(generator, discriminator, dataloader, params):
     decay_factor = config.get("decay_factor", 1.00004)
     num_epochs = config.get("num_epochs", 10)
     z_dim = config.get("z_dim", 100)
-    n_classes = config.get("n_classes", 10)
-    checkpoint_params = config.get("checkpoint", {})
-    checkpoint_dir = checkpoint_params.get("output_dir", "checkpoints/")
-    checkpoint_save_frequency = checkpoint_params.get("save_frequency", 100)
-    samples_params = config.get("generated_samples", {})
-    samples_save_frequency = samples_params.get("save_frequency", 100)
+    samples_save_frequency = config.get("samples_save_frequency", 100)
     checkpoint_path = config.get("checkpoint_path")
-    loss_plots_dir = os.path.join(checkpoint_dir, "loss_plots/")
+
+    # generate run id
+    id = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
     # ensure directory exist
-    os.makedirs(checkpoint_dir, exist_ok=True)
+    run_dir = os.path.join("../runs", id)
+    os.makedirs(run_dir, exist_ok=True)
+    loss_plots_dir = os.path.join(run_dir, "loss_plots/")
     os.makedirs(loss_plots_dir, exist_ok=True)
+    samples_dir = os.path.join(run_dir, "generated/")
+    os.makedirs(samples_dir, exist_ok=True)
 
     # setup training
     bce = nn.BCELoss().to(DEVICE)
@@ -89,12 +108,12 @@ def train_cgan(generator, discriminator, dataloader, params):
 
         for images, labels in tqdm(dataloader, desc=f"Epoch {epoch+1}/{num_epochs}"):
             batch_size = images.size(0)
-            real_images = images.view(batch_size, -1).to(device)  # flatten images
-            labels = labels.to(device)
+            real_images = images.view(batch_size, -1).to(DEVICE)  # flatten images
+            labels = labels.to(DEVICE)
 
             # labels for real (1s) and fake (0s) images
-            real_labels = torch.ones(batch_size, 1).to(device)
-            fake_labels = torch.zeros(batch_size, 1).to(device)
+            real_labels = torch.ones(batch_size, 1).to(DEVICE)
+            fake_labels = torch.zeros(batch_size, 1).to(DEVICE)
 
 
             # ---- train discriminator ----
@@ -104,7 +123,7 @@ def train_cgan(generator, discriminator, dataloader, params):
             real_output = discriminator(real_images, labels)
 
             # fake images
-            noise = torch.randn(batch_size, z_dim).to(device)
+            noise = torch.randn(batch_size, z_dim).to(DEVICE)
             fake_images = generator(noise, labels)
             fake_output = discriminator(fake_images.detach(), labels)
 
@@ -149,16 +168,23 @@ def train_cgan(generator, discriminator, dataloader, params):
 
         print("Gen loss:", g_losses[-1], "Disc loss:", d_losses[-1])
 
-        # save checkpoints and samples periodically
-        if (epoch + 1) % checkpoint_save_frequency == 0:
-            save_checkpoint(epoch, generator, discriminator, generator_optimizer, discriminator_optimizer, g_loss_epoch, d_loss_epoch, checkpoint_dir)
-
+        # save samples periodically
         if (epoch + 1) % samples_save_frequency == 0:
-            save_generated_samples(epoch, generator, z_dim, n_classes, device)
+            save_generated_samples(epoch, generator, samples_dir)
+
+        # save best generator
+        if g_losses[-1] < best_g_loss:
+            best_g_loss = g_losses[-1]
+            torch.save(generator.state_dict(), os.path.join(run_dir, "best_generator.pth"))
+
+        # save best discriminator
+        if d_losses[-1] < best_d_loss:
+            best_d_loss = d_losses[-1]
+            torch.save(discriminator.state_dict(), os.path.join(run_dir, "best_discriminator.pth"))
 
     # final checkpoint save
-    save_checkpoint(epoch, generator, discriminator, generator_optimizer, discriminator_optimizer, g_loss_epoch, d_loss_epoch, checkpoint_dir)
-    save_generated_samples(epoch, generator, z_dim, n_classes, device)
+    save_checkpoint(epoch, generator, discriminator, generator_optimizer, discriminator_optimizer, g_loss_epoch, d_loss_epoch, run_dir)
+    save_generated_samples(epoch, generator, samples_dir)
 
     # finish logging
     wandb.finish()

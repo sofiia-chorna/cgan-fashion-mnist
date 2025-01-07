@@ -49,25 +49,6 @@ def get_input_params():
     return args.params, mode
 
 
-def load_checkpoint(checkpoint_path, generator, discriminator, generator_optimizer=None, discriminator_optimizer=None, load_optimizers=True):
-    """Load model and optimizer states from a checkpoint file."""
-    if checkpoint_path and os.path.exists(checkpoint_path):
-        checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
-        generator.load_state_dict(checkpoint['generator_state_dict'])
-        discriminator.load_state_dict(checkpoint['discriminator_state_dict'])
-
-        if load_optimizers:
-            if generator_optimizer and discriminator_optimizer:
-                generator_optimizer.load_state_dict(checkpoint['generator_optimizer_state_dict'])
-                discriminator_optimizer.load_state_dict(checkpoint['discriminator_optimizer_state_dict'])
-
-        start_epoch = checkpoint['epoch']
-        print(f"Loading a checkpoint from epoch {start_epoch}...")
-        return start_epoch
-    print(f"Checkpoint file {checkpoint_path} is not found")
-    return 0
-
-
 def plot_losses(gen_losses, disc_losses, epoch, save_dir):
     epochs = list(range(epoch + 1, epoch + 1 + len(gen_losses)))
 
