@@ -6,10 +6,10 @@ You will work with the Fashion MNIST dataset, aiming to implement a Conditional 
 ### Architecture
 The architecture and implementation wholy follow the CGAN paper [1], including the choice of optimizers, schedulers, hyperparameters etc. As mentioned in the paper, the Maxout activation [2] is used for the discriminator.
 
-For logging, I tried to use [Weight & Biases](https://wandb.ai/site/), and indeed it does suprisingly great plots with all possible statistics.
+For logging, I tried to use [Weight & Biases](https://wandb.ai/site/), and indeed it does suprisingly great plots with all possible statistics for the training.
 
 #### Analysis
-To analyse the generated data sets, I used dimentionality reduction analysis with the classical PCA and FID metric.  
+To analyse the generated data sets, I used a FID metric and a dimentionality reduction analysis with the classical PCA.  
 
 ### Results with the architecture proposed in [1] 
 TODO
@@ -20,7 +20,7 @@ TODO
 
 ### Further experiments
 Trying to improve the quality of the generated images, I used some of the proposed techniques from the [3] paper.
-- Normalisation of the inputs: (normalise images between -1 and 1 and used of tanh as the last layer of the generator output)
+- Normalisation of the inputs: (normalise images between -1 and 1 and use of tanh as the last layer of the generator output)
 - Use of gaussian noise instead of one with uniform distribution
 - One-sided label smoothing (replace the 0 and 1 targets for a classifier with smoothed values, like .9 or .1)
 
