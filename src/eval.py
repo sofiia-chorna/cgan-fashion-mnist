@@ -35,8 +35,10 @@ def save_generated_samples(generator, output_dir, num_samples):
     return generated_samples, labels
 
 
-def get_pca(samples, labels, output_dir):
+def get_pca(samples, labels, output_dir, real=False):
     """Apply PCA on the samples"""
+    prefix = 'real' if real else 'generated'
+
     # flatten to (num_samples, num_features)
     samples = samples.view(samples.size(0), -1).cpu().detach().numpy()
 
@@ -46,10 +48,11 @@ def get_pca(samples, labels, output_dir):
 
     plt.scatter(X_reduced[:, 0], X_reduced[:, 1], c=labels.cpu().detach().numpy(), cmap='viridis')
     plt.colorbar()
-    plt.title("PCA of Generated Samples")
-    plt.xlabel("PCA Component 1")
-    plt.ylabel("PCA Component 2")
-    pca_plot_path = os.path.join(output_dir, "pca_plot.png")
+    plt.title(f"PCA of {prefix} samples")
+    plt.xlabel("PCA 1")
+    plt.ylabel("PCA 2")
+
+    pca_plot_path = os.path.join(output_dir, f"{prefix}_pca_plot.png")
     plt.savefig(pca_plot_path)
     plt.close()
 
@@ -82,7 +85,11 @@ def eval_cgan(generator, discriminator, dataloader, params):
     # save some generated samples
     generated_samples, labels = save_generated_samples(generator, output_dir, num_samples)
 
-    # pca
-    get_pca(generated_samples, labels, output_dir)
+    # get a batch from the test data
+    real_samples, real_labels = next(iter(dataloader))
+
+    # pca on generated and read samples
+    get_pca(generated_samples, labels, output_dir, real=False)
+    get_pca(real_samples, real_labels, output_dir, real=True)
 
     # fid
