@@ -8,14 +8,41 @@ The architecture and implementation wholy follow the CGAN paper [1], including t
 
 For logging, I tried to use [Weight & Biases](https://wandb.ai/site/), and indeed it does suprisingly great plots with all possible statistics for the training.
 
+During the training, "best" models for generator and discriminator are saved, as well as the checkpoint on the last epoch, samples generated during the training in the interval from params.yaml, and a loss plot, to the auto-generated "runs" folder. During evaluation, the generated batch sample of images is saved as well as used labels, plots for dimentionality reductions and a batch of real data used, as well as a FID score plot.
+
+During the training process, the following file appear in the auto-generated folder "runs": the most optimal models for both the generator and discriminator; a checkpoint from the final epoch; samples generated during the training, in the interval specified in the `params.yaml`; a loss plot. During the evaluation, the files created in the "eval" folder are: a batch of generated images and their  labels; a batch of real data used in the evaluation; plots for dimensionality reductions (pca, tsne) for real and generated batches; a plot of the FID score.
+
 #### Analysis
-To analyse the generated data sets, I used a FID metric and a dimentionality reduction analysis with the classical PCA.  
+To evaluate the performance of the generated data sets, I used the FID metric and dimensionality reduction analysis. The models were trained for 100 epochs, and the checkpoints corresponding to the most optimal models were selected for evaluation.
 
 ### Results with the architecture proposed in [1] 
-TODO
-- generation examples
-- loss plot
-- PCA
+
+#### Loss
+The following plot shows the loss values for both the discriminator and the generator during the training. 
+<img src="eval/2025-01-08_01-55-51/generated_images.png" alt="Loss plot" width="450" />
+
+#### Generation examples
+The image below presents 196 generated samples. The quality is visibly far from ideal, the generated images seems noise, so there is a room for improvement.
+
+<img src="plots/cgan_losses_100_epoches.png" alt="Loss plot" width="450" />
+
+#### Dimentionality reduction
+I use dimensionality reduction to compare feature distributions for real and generated data. For this, I used two algorithms: PCA and t-SNE. PCA is quite straightforward, but at first, I didn't find the clusters very meaningful, even for the real data. On the other hand, as for me, t-SNE provides better clustering, but it is stochastic (and it can even cluster random gaussian noise as mentioned in [4]). Hence, I remained them too.
+
+To extract features from the images, I used a pretrained InceptionV3 model, as it also serves in calculating the FID score (see below).
+
+Real data
+<div style="display: flex; justify-content: space-around;">
+  <img src="eval/2025-01-08_01-55-51/real_pca_plot.png" alt="Real data pca" width="450" />
+  <img src="eval/2025-01-08_01-55-51/real_tsne_plot.png" alt="Real data t-sne" width="450" />
+</div>
+
+Generated data
+<div style="display: flex; justify-content: space-around;">
+  <img src="eval/2025-01-08_01-55-51/generated_pca_plot.png" alt="Generated data pca" width="450" />
+  <img src="eval/2025-01-08_01-55-51/generated_tsne_plot.png" alt="Generated data t-sne" width="450" />
+</div>
+
 - FID
 
 ### Further experiments
@@ -31,6 +58,34 @@ TODO
 - PCA
 - FID
 
+## How to run
+1. Install the packages and go to src folder:
+    ```
+    pip install -r requirements.txt
+    cd src
+    ```
+
+2. Run the script (1) to train a model, (2) to run evaluation:
+    ```
+    ### (1) train
+    python main.py --params params.yaml --train
+
+    ### or
+
+    python main.py --train
+    ```
+
+    ```
+    ### (2) evaluate
+    python main.py --params params.yaml --eval
+
+    ### or
+
+    python main.py --eval
+    ```
+
+The argument """--params""" is a path to the yaml file with hyperparamenets, default is params.yaml.
+
 ## Feedback
 The results aren't as promising as I had hoped 😕 : quality of the generated images is currently not that high. Upon further reflection, I suppose that using convolutional layers instead of fully connected layers would have likely improved performance significantly... Anyways, it was still a nice task for me 😇
 
@@ -40,3 +95,5 @@ The results aren't as promising as I had hoped 😕 : quality of the generated i
 [2] Goodfellow, I. J., et al. (2013). Maxout Networks. https://arxiv.org/abs/1302.4389
 
 [3] Salimans, T., et al. (2016). Improved techniques for training GANs. https://arxiv.org/abs/1606.03498
+
+[4] Wattenberg, et al. (2016). How to Use t-SNE Effectively. http://doi.org/10.23915/distill.00002
