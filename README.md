@@ -6,11 +6,9 @@ You will work with the Fashion MNIST dataset, aiming to implement a Conditional 
 ### Architecture
 The architecture and implementation wholy follow the CGAN paper [1], including the choice of optimizers, schedulers, hyperparameters etc. As mentioned in the paper, the Maxout activation [2] is used for the discriminator.
 
-For logging, I tried to use [Weight & Biases](https://wandb.ai/site/), and indeed it does suprisingly great plots with all possible statistics for the training.
-
-During the training, "best" models for generator and discriminator are saved, as well as the checkpoint on the last epoch, samples generated during the training in the interval from params.yaml, and a loss plot, to the auto-generated "runs" folder. During evaluation, the generated batch sample of images is saved as well as used labels, plots for dimentionality reductions and a batch of real data used, as well as a FID score plot.
-
 During the training process, the following file appear in the auto-generated folder "runs": the most optimal models for both the generator and discriminator; a checkpoint from the final epoch; samples generated during the training, in the interval specified in the `params.yaml`; a loss plot. During the evaluation, the files created in the "eval" folder are: a batch of generated images and their  labels; a batch of real data used in the evaluation; plots for dimensionality reductions (pca, tsne) for real and generated batches; a plot of the FID score.
+
+For logging, I tried to use [Weight & Biases](https://wandb.ai/site/), and indeed it does nice plots for the training.
 
 #### Analysis
 To evaluate the performance of the generated data sets, I used the FID metric and dimensionality reduction analysis. The models were trained for 100 epochs, and the checkpoints corresponding to the most optimal models were selected for evaluation.
@@ -20,15 +18,15 @@ To evaluate the performance of the generated data sets, I used the FID metric an
 #### Loss
 The following plot shows the loss values for both the discriminator and the generator during the training. 
 
-<img src="eval/2025-01-08_01-55-51/generated_images.png" alt="Loss plot" width="400" />
+<img src="plots/cgan_losses_100_epoches.png" alt="Loss plot" width="500" />
 
 #### Generation examples
 The image below presents 196 generated samples. The quality is visibly far from ideal, the generated images seems noise, so there is a room for improvement.
 
-<img src="plots/cgan_losses_100_epoches.png" alt="Loss plot" width="500" />
+<img src="eval/2025-01-08_01-55-51/generated_images.png" alt="Loss plot" width="400" />
 
 #### Dimentionality reduction
-I use dimensionality reduction to compare feature distributions for real and generated data. For this, I used two algorithms: PCA and t-SNE. PCA is quite straightforward, but at first, I didn't find the clusters very meaningful, even for the real data. On the other hand, as for me, t-SNE provides better clustering, but it is stochastic (and it can even cluster random gaussian noise as mentioned in [4]). Hence, I remained them too.
+To compare feature distributions for real and generated data, I used two algorithms: PCA and t-SNE. PCA is quite straightforward, but at first, I didn't find the clusters very meaningful, even for the real data. On the other hand, as for me, t-SNE provides better clustering, but it is stochastic (and it can even cluster random gaussian noise as mentioned in [4]). Hence, I remained them too.
 
 To extract features from the images, I used a pretrained InceptionV3 model, as it also serves in calculating the FID score (see below).
 
