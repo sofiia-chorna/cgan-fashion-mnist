@@ -16,19 +16,19 @@ class Generator(nn.Module):
         # fully connected layers for noise and labels
         self.fc_noise = nn.Sequential(
             nn.Linear(self.z_dim, 200),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Dropout(self.droupout)
         )
         self.fc_label = nn.Sequential(
             nn.Linear(self.n_classes, 1000),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Dropout(self.droupout)
         )
 
         # combined layers
         self.fc_combined = nn.Sequential(
             nn.Linear(200 + 1000, 1200),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Dropout(self.droupout)
         )
 
