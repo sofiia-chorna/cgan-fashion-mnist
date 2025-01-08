@@ -1,5 +1,5 @@
 random_seed: 42
-batch_size: 100
+batch_size: 196
 
 model:
   n_classes: 10  # number of classes
@@ -19,6 +19,6 @@ training:
 evaluation:
   checkpoints:  # path to saved checkpoint file  (relative to the params.yaml)
     discriminator_path: "../runs/2025-01-08_00-15-35/best_discriminator.pth"
-    generator_path: "../runs/2025-01-08_00-15-35/best_generator.pth"
+    generator_path: "../runs/2025-01-08_00-59-57/best_generator.pth"
   output_dir: "../eval/"  # directory to save evaluations
-  num_samples: 100  # number of images to generate
+  num_samples: 196  # number of images to generate

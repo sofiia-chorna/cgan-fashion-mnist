@@ -7,7 +7,7 @@ from utils import DEVICE
 from dim_red import run_dim_reduction, get_feature_extractor
 
 
-def save_images(images, labels, output_dir, prefix, nrow=10):
+def save_images(images, labels, output_dir, prefix, nrow=14):
     """Helper function to save images and labels"""
     # save image grid
     grid = torchvision.utils.make_grid(images, nrow=nrow)
