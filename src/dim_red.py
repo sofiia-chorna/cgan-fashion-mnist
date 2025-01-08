@@ -69,9 +69,11 @@ def get_embeddings(feature_extractor, samples):
 
     # transform the entire batch
     samples = samples.to(DEVICE)
+    feature_extractor = feature_extractor.to(DEVICE)
     transformed_samples = torch.stack([
         transform(transforms.ToPILImage()(img).convert("RGB")) for img in samples
-    ])
+    ]).to(DEVICE)
+
     with torch.no_grad():
         features = feature_extractor(transformed_samples)
 
