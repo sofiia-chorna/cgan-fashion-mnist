@@ -49,10 +49,6 @@ def generate_samples(generator, output_dir, num_samples, save=False):
     return generated_samples, labels
 
 
-def get_fid():
-    pass
-
-
 def eval_cgan(generator, discriminator, dataloader, params):
     # init w&b
     wandb.init(project="cgan-fashion-mnist", config=params, job_type="eval")
@@ -88,5 +84,3 @@ def eval_cgan(generator, discriminator, dataloader, params):
     feature_extractor = get_feature_extractor()
     run_dim_reduction(feature_extractor, real_samples, real_labels, output_dir, real=True)
     run_dim_reduction(feature_extractor, generated_samples, labels, output_dir, real=False)
-
-    # fid

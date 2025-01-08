@@ -14,7 +14,7 @@ generator = Generator(params["model"])
 discriminator = Discriminator(params["model"])
 
 if mode == "train":
-    train_dl = get_fashion_mnist_dataloader(train=True)
+    train_dl = get_fashion_mnist_dataloader(train=True, batch_size=batch_size)
     train_cgan(generator, discriminator, train_dl, params["training"])
 else:
     test_dl = get_fashion_mnist_dataloader(train=False, batch_size=batch_size)

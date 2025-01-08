@@ -50,20 +50,31 @@ def get_input_params():
 
 
 def plot_losses(gen_losses, disc_losses, epoch, save_dir):
-    epochs = list(range(epoch + 1, epoch + 1 + len(gen_losses)))
+    epochs = list(range(epoch + 1))
 
     # plot
     plt.figure(figsize=(10, 5))
-    plt.plot(epochs, gen_losses, label="Generator Loss", color="blue", marker="o")
-    plt.plot(epochs, disc_losses, label="Discriminator Loss", color="red", marker="x")
+    plt.plot(epochs, gen_losses, label="Generator loss", color="blue")
+    plt.plot(epochs, disc_losses, label="Discriminator loss", color="red")
     plt.xlabel("Epochs")
     plt.ylabel("Loss")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.title("Generator and Discriminator Loss Over Epochs")
+    plt.title("Generator and Discriminator loss over epochs")
 
     # save fig
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    plt.savefig(os.path.join(save_dir, f"loss_plot_{timestamp}.png"))
+    plt.savefig(os.path.join(save_dir, f"loss.png"))
+    plt.close()
+
+
+def plot_fid(fid_scores, output_path):
+    """Plot FID scores"""
+    plt.figure(figsize=(8, 6))
+    plt.plot(range(1, len(fid_scores) + 1), fid_scores, linestyle='-', color='b')
+    plt.title("FID Scores over epochs")
+    plt.xlabel("Epoch")
+    plt.ylabel("FID score")
+    plt.grid(True)
+    plt.savefig(output_path)
     plt.close()

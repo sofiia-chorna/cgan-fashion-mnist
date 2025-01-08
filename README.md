@@ -6,7 +6,9 @@ You will work with the Fashion MNIST dataset, aiming to implement a Conditional 
 ### Architecture
 The architecture and implementation wholy follow the CGAN paper [1], including the choice of optimizers, schedulers, hyperparameters etc. As mentioned in the paper, the Maxout activation [2] is used for the discriminator.
 
-During the training process, the following file appear in the auto-generated folder "runs": the most optimal models for both the generator and discriminator; a checkpoint from the final epoch; samples generated during the training, in the interval specified in the `params.yaml`; a loss plot. During the evaluation, the files created in the "eval" folder are: a batch of generated images and their  labels; a batch of real data used in the evaluation; plots for dimensionality reductions (pca, tsne) for real and generated batches; a plot of the FID score.
+During the training, the following files appear in the auto-generated folder "runs": optimal models for generator and discriminator; a checkpoint from the final epoch; samples generated during the training; a loss plot; a fid scores plot.
+
+During the evaluation, the files created in the "eval" folder are: a batch of generated images and their labels; a batch of real data used in the evaluation; plots for dimensionality reductions (pca, tsne) for real and generated batches.
 
 For logging, I tried to use [Weight & Biases](https://wandb.ai/site/), and indeed it does nice plots for the training.
 
