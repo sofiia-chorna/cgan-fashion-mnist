@@ -18,6 +18,11 @@ To evaluate the performance of the generated data sets, I used the FID metric an
 ### Results with the architecture proposed in [1] 
 
 #### Loss
+Here we can see the plot of FID score calculated for each epoch on 1000 samples. 
+
+<img src="runs/2025-01-08_01-55-51/fid_scores.png" alt="FID score" width="500" />
+
+#### FID score
 The following plot shows the loss values for both the discriminator and the generator during the training. 
 
 <img src="plots/cgan_losses_100_epoches.png" alt="Loss plot" width="500" />
@@ -30,7 +35,7 @@ The image below presents 196 generated samples. The quality is visibly far from 
 #### Dimentionality reduction
 To compare feature distributions for real and generated data, I used two algorithms: PCA and t-SNE. PCA is quite straightforward, but at first, I didn't find the clusters very meaningful, even for the real data. On the other hand, as for me, t-SNE provides better clustering, but it is stochastic (and it can even cluster random gaussian noise as mentioned in [4]). Hence, I remained them too.
 
-To extract features from the images, I used a pretrained InceptionV3 model, as it also serves in calculating the FID score (see below).
+To extract features from the images, I used a pretrained InceptionV3 model, as it also serves in calculating the FID score.
 
 Real data
 <div style="display: flex; justify-content: space-around;">
@@ -44,7 +49,6 @@ Generated data
   <img src="eval/2025-01-08_01-55-51/generated_tsne_plot.png" alt="Generated data t-sne" width="400" />
 </div>
 
-- FID
 
 ### Further experiments
 Trying to improve the quality of the generated images, I used some of the proposed techniques from the [3] paper.
