@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import wandb
-from utils import DEVICE
+from utils.general import DEVICE
 
 
 def get_feature_extractor():

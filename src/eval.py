@@ -3,7 +3,7 @@ from datetime import datetime
 import torch
 import torchvision
 import wandb
-from utils import DEVICE
+from utils.general import DEVICE
 from dim_red import run_dim_reduction, get_feature_extractor
 
 

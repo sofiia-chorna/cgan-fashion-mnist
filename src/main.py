@@ -1,9 +1,10 @@
-from utils import get_input_params, read_yaml
 from cgan.generator import Generator
 from cgan.discriminator import Discriminator
 from dataset import get_fashion_mnist_dataloader
 from train import train_cgan
 from eval import eval_cgan
+from utils.general import get_input_params, read_yaml
+from utils.model import initialize_weights
 
 
 yaml_file, mode = get_input_params()
@@ -13,7 +14,11 @@ batch_size = params.get("batch_size", 64)
 generator = Generator(params["model"])
 discriminator = Discriminator(params["model"])
 
+
 if mode == "train":
+    # Apply the initialization to both the generator and discriminator
+    generator.apply(initialize_weights)
+    discriminator.apply(initialize_weights)
     train_dl = get_fashion_mnist_dataloader(train=True, batch_size=batch_size)
     train_cgan(generator, discriminator, train_dl, params["training"])
 else:
