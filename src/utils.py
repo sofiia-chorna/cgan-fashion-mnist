@@ -1,5 +1,4 @@
 import os
-import time
 import argparse
 import matplotlib.pyplot as plt
 import torch

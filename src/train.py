@@ -159,10 +159,11 @@ def train_cgan(generator, discriminator, dataloader, params):
             real_images = images.view(batch_size, -1).to(DEVICE)  # flatten images
             labels = labels.to(DEVICE)
 
-            # labels for real (1s) and fake (0s) images
-            real_labels = torch.ones(batch_size, 1).to(DEVICE)
-            fake_labels = torch.zeros(batch_size, 1).to(DEVICE)
-
+            # smoothed real and fake labels
+            real_labels = torch.ones(batch_size, 1) * 0.9
+            fake_labels = torch.zeros(batch_size, 1) * 0.1
+            real_labels = real_labels.to(DEVICE)
+            fake_labels = fake_labels.to(DEVICE)
 
             # ---- train discriminator ----
             discriminator_optimizer.zero_grad()

@@ -18,14 +18,17 @@ To evaluate the performance of the generated data sets, I used the FID metric an
 ### Results with the architecture proposed in [1] 
 
 #### Loss
-Here we can see the plot of FID score calculated for each epoch on 1000 samples. 
-
-<img src="runs/2025-01-08_01-55-51/fid_scores.png" alt="FID score" width="500" />
-
-#### FID score
 The following plot shows the loss values for both the discriminator and the generator during the training. 
 
 <img src="plots/cgan_losses_100_epoches.png" alt="Loss plot" width="500" />
+
+#### FID score
+Here we can see the plot of FID score calculated for each epoch on 1000 samples. 
+
+<img src="runs/2025-01-08_00-59-57/plots/fid_scores.png" alt="FID score" width="500" />
+
+The FID score is currently quite high, but it was evaluated for 100 epochs. I believe it could decrease further with longer training.
+
 
 #### Generation examples
 The image below presents 196 generated samples. The quality is visibly far from ideal, the generated images seems noise, so there is a room for improvement.
@@ -43,18 +46,20 @@ Real data
   <img src="eval/2025-01-08_01-55-51/real_tsne_plot.png" alt="Real data t-sne" width="400" />
 </div>
 
+For both methods, the images corresponding to label 9 (ankle boot) and label 8 (bag) are well-separated; labels 0 (t-shirt), 2 (pullover), and 3 (dress) tend to be mixed, they likely share similar concepts.
+
 Generated data
 <div style="display: flex; justify-content: space-around;">
   <img src="eval/2025-01-08_01-55-51/generated_pca_plot.png" alt="Generated data pca" width="400" />
   <img src="eval/2025-01-08_01-55-51/generated_tsne_plot.png" alt="Generated data t-sne" width="400" />
 </div>
 
+The clusters in PCA for the generated images are more mixed, though still visible. Surprisingly, the clusters in t-SNE for the generated images are better-separated. I suspect that the lower quality and more simplified nature of those images make it easier to distinguish them.
 
 ### Further experiments
 Trying to improve the quality of the generated images, I used some of the proposed techniques from the [3] paper.
 - Normalisation of the inputs: (normalise images between -1 and 1 and use of tanh as the last layer of the generator output)
-- Use of gaussian noise instead of one with uniform distribution
-- One-sided label smoothing (replace the 0 and 1 targets for a classifier with smoothed values, like .9 or .1)
+- Label smoothing (replace the 0 and 1 for labels with smoothed values, like 0.9 an 0.1)
 
 ### Results with the some techniques improvements proposed in [3]
 TODO
