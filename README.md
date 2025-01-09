@@ -9,7 +9,7 @@ During the training, the following files appear in the auto-generated folder "ru
 
 During the evaluation, the files created in the "eval" folder are: a batch of generated images and their labels; a batch of real data used in the evaluation; plots for dimensionality reductions (pca, tsne) for real and generated batches.
 
-For logging, I tried to use [Weight & Biases](https://wandb.ai/site/), and indeed it does nice plots for the training.
+For logging, I tried to use [Weight & Biases](https://wandb.ai/site/), and indeed it does nice plots for the training & logs 
 
 #### Analysis
 To evaluate the performance of the generated data sets, I used the FID metric and dimensionality reduction analysis. The models were trained for 100 epochs, and the checkpoints corresponding to the most optimal models were selected for evaluation.
@@ -94,6 +94,19 @@ Generated data
 
 The clusters obtained for generated data seems slightely improved for both methods. For further comparison, a londer training is necessary.
 
+## Code organisation
+```
+root/
+├── eval/                     # Folder generated during evaluation for each run
+│   ├── 2025-01-08_01-55-51/  # Evaluation results for CGAN based on [1]
+│   └── 2025-01-09_01-00-08/  # Evaluation results for CGAN based on [1] with improved techniques from [3]
+├── plots/                    # Plots for README.md taken from Weights & Biases
+├── runs/                     # Folder generated during training for each run
+│   ├── 2025-01-08_00-59-57/  # Training results for CGAN based on [1]
+│   └── 2025-01-09_00-33-46/  # Training results for CGAN based on [1] with improved techniques from [3]
+└── src/                      # Source code with implementation
+```
+
 ## How to run
 1. Install the packages and go to src folder:
     ```
@@ -123,7 +136,7 @@ The clusters obtained for generated data seems slightely improved for both metho
 The argument """--params""" is a path to the yaml file with hyperparamenets, default is params.yaml.
 
 ## Feedback
-The results aren't as promising as I had hoped 😂: quality of the generated images is currently not that high. Upon further reflection, I suppose that using convolutional layers instead of fully connected layers would have likely improved performance... Anyways, it was still a nice task for me 😇
+The results aren't as promising as I had hoped 😂 : quality of the generated images is currently not that high. Upon further reflection, I suppose that using convolutional layers instead of fully connected layers would have likely improved performance... Anyways, it was still a nice task for me 😇
 
 ## References
 [1] Mirza, M., & Osindero, S. (2014). Conditional Generative Adversarial Nets. https://arxiv.org/abs/1411.1784
