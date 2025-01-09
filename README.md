@@ -20,7 +20,7 @@ To evaluate the performance of the generated data sets, I used the FID metric an
 #### Loss
 The following plot shows the loss values for both the discriminator and the generator during the training. 
 
-<img src="plots/cgan_losses_100_epoches.png" alt="Loss plot" width="500" />
+<img src="plots/cgan_losses_100_epoches_v1.png" alt="Loss plot" width="500" />
 
 #### FID score
 Here we can see the plot of FID score calculated for each epoch on 1000 samples. 
@@ -58,15 +58,42 @@ The clusters in PCA for the generated images are more mixed, though still visibl
 
 ### Further experiments
 Trying to improve the quality of the generated images, I used some of the proposed techniques from the [3] paper.
-- Normalisation of the inputs: (normalise images between -1 and 1 and use of tanh as the last layer of the generator output)
-- Label smoothing (replace the 0 and 1 for labels with smoothed values, like 0.9 an 0.1)
+- One-side label smoothing (instead of labeling real data as 1, label it as a value slightly less than 1, e.g., 0.9)
+- Xavier initialization for both models
+- Use of LeakyReLU
+
+Also, I tried to normalise images between -1 and 1 and use of tanh in the generator output -- but it did not work well for me.
 
 ### Results with the some techniques improvements proposed in [3]
-TODO
-- generation examples
-- loss plot
-- PCA
-- FID
+#### Loss
+The following plot shows the loss values for both the discriminator and the generator during the training. 
+
+<img src="plots/cgan_losses_100_epoches_v2.png" alt="Loss plot" width="500" />
+
+#### FID score
+FID score starts with the lower value on the first epoch, besides that, it does not seems to be really improved for those 100 epochs.
+
+<img src="runs/2025-01-09_00-33-46/plots/fid_scores.png" alt="FID score" width="500" />
+
+#### Generation examples
+The generated images are seems to be a bit less noisy (or I try to convince myself).
+
+<img src="eval/2025-01-09_01-00-08/generated_images.png" alt="Loss plot" width="400" />
+
+#### Dimentionality reduction
+Real data
+<div style="display: flex; justify-content: space-around;">
+  <img src="eval/2025-01-09_01-00-08/real_pca_plot.png" alt="Real data pca" width="400" />
+  <img src="eval/2025-01-09_01-00-08/real_tsne_plot.png" alt="Real data t-sne" width="400" />
+</div>
+
+Generated data
+<div style="display: flex; justify-content: space-around;">
+  <img src="eval/2025-01-09_01-00-08/generated_pca_plot.png" alt="Generated data pca" width="400" />
+  <img src="eval/2025-01-09_01-00-08/generated_tsne_plot.png" alt="Generated data t-sne" width="400" />
+</div>
+
+The clusters obtained for generated data seems slightely improved for both methods. For further comparison, a londer training is necessary.
 
 ## How to run
 1. Install the packages and go to src folder:
@@ -97,7 +124,7 @@ TODO
 The argument """--params""" is a path to the yaml file with hyperparamenets, default is params.yaml.
 
 ## Feedback
-The results aren't as promising as I had hoped 😕 : quality of the generated images is currently not that high. Upon further reflection, I suppose that using convolutional layers instead of fully connected layers would have likely improved performance significantly... Anyways, it was still a nice task for me 😇
+The results aren't as promising as I had hoped 😂: quality of the generated images is currently not that high. Upon further reflection, I suppose that using convolutional layers instead of fully connected layers would have likely improved performance... Anyways, it was still a nice task for me 😇
 
 ## References
 [1] Mirza, M., & Osindero, S. (2014). Conditional Generative Adversarial Nets. https://arxiv.org/abs/1411.1784
