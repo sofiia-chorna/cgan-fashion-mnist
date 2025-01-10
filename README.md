@@ -30,7 +30,7 @@ The FID score is currently quite high, but it was evaluated for 100 epochs. I be
 
 
 #### Generation examples
-The image below presents 196 generated samples. The quality is visibly far from ideal, the generated images seems noise, so there is a room for improvement.
+The image below presents 196 generated samples. The quality is visibly far from ideal, the generated images seems noisy, so there is a room for improvement.
 
 <img src="eval/2025-01-08_01-55-51/generated_images.png" alt="Loss plot" width="400" />
 
@@ -68,6 +68,8 @@ Also, I tried to normalise images between -1 and 1 and use of tanh in the genera
 The following plot shows the loss values for both the discriminator and the generator during the training. 
 
 <img src="plots/cgan_losses_100_epoches_v2.png" alt="Loss plot" width="500" />
+
+The minimum value of the loss of the generator is smaller than for the previous try.
 
 #### FID score
 FID score starts with the lower value on the first epoch, besides that, it does not seems to be really improved for those 100 epochs.
