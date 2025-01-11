@@ -16,7 +16,6 @@ discriminator = Discriminator(params["model"])
 
 
 if mode == "train":
-    # Apply the initialization to both the generator and discriminator
     generator.apply(initialize_weights)
     discriminator.apply(initialize_weights)
     train_dl = get_fashion_mnist_dataloader(train=True, batch_size=batch_size)
