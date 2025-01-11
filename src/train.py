@@ -11,21 +11,7 @@ from utils.general import DEVICE, plot_losses, plot_fid
 from dim_red import get_feature_extractor
 
 
-def initialize_weights(m):
-    """Use of xavier initialization"""
-    if isinstance(m, nn.Linear):
-        nn.init.xavier_normal_(m.weight)
-
-        # set biases to 0
-        if m.bias is not None:
-            nn.init.constant_(m.bias, 0)
-
-
 def train_cgan(generator, discriminator, dataloader, params):
-    # []
-    generator.apply(initialize_weights)
-    discriminator.apply(initialize_weights)
-
     g_losses, d_losses, fid_scores = [], [], []
     best_g_loss, best_d_loss = float('inf'), float('inf')
 
